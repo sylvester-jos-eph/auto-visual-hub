@@ -1,5 +1,8 @@
 import { Car } from '../types';
 
+export const APP_NAME = "SiLLA AUTOHUB";
+export const DEFAULT_WHATSAPP = "0741958421"; // Explicitly defined default
+
 export const MOCK_CARS: Car[] = [
   {
     id: '1',
@@ -21,6 +24,7 @@ export const MOCK_CARS: Car[] = [
     location: 'California, USA',
     sellerId: 's1',
     sellerName: 'Elite Motors',
+    sellerWhatsapp: DEFAULT_WHATSAPP,
     isAuction: false,
     status: 'available',
     specs: {
@@ -48,6 +52,7 @@ export const MOCK_CARS: Car[] = [
     location: 'Miami, FL',
     sellerId: 's2',
     sellerName: 'Sunset Exotic Cars',
+    sellerWhatsapp: DEFAULT_WHATSAPP,
     isAuction: true,
     auctionEndTime: new Date(Date.now() + 1000 * 60 * 60 * 48).toISOString(), // 48 hours from now
     currentBid: 95000,
@@ -62,56 +67,58 @@ export const MOCK_CARS: Car[] = [
   },
   {
     id: '3',
-    make: 'BMW',
-    model: 'X5 xDrive40i',
+    make: 'Lamborghini',
+    model: 'Aventador SVJ',
     year: 2022,
-    price: 62500,
-    images: ['https://storage.googleapis.com/dala-prod-public-storage/generated-images/deb913b9-2ff6-42c1-8b8e-1fa1eb9cef03/hero-car-1eb4515b-1774844776085.webp'],
-    image: 'https://storage.googleapis.com/dala-prod-public-storage/generated-images/deb913b9-2ff6-42c1-8b8e-1fa1eb9cef03/hero-car-1eb4515b-1774844776085.webp',
-    gallery: ['https://storage.googleapis.com/dala-prod-public-storage/generated-images/deb913b9-2ff6-42c1-8b8e-1fa1eb9cef03/hero-car-1eb4515b-1774844776085.webp'],
-    mileage: 24000,
+    price: 450000,
+    images: ['https://storage.googleapis.com/dala-prod-public-storage/generated-images/deb913b9-2ff6-42c1-8b8e-1fa1eb9cef03/featured-car-2-411a0833-1774845104618.webp'],
+    image: 'https://storage.googleapis.com/dala-prod-public-storage/generated-images/deb913b9-2ff6-42c1-8b8e-1fa1eb9cef03/featured-car-2-411a0833-1774845104618.webp',
+    gallery: ['https://storage.googleapis.com/dala-prod-public-storage/generated-images/deb913b9-2ff6-42c1-8b8e-1fa1eb9cef03/featured-car-2-411a0833-1774845104618.webp'],
+    mileage: 800,
     fuelType: 'Petrol',
     transmission: 'Automatic',
-    condition: 'Used',
-    engine: '3.0L I6',
-    location: 'Texas, USA',
+    condition: 'New',
+    engine: '6.5L V12',
+    location: 'Dubai, UAE',
     sellerId: 's3',
-    sellerName: 'John Doe',
-    isAuction: false,
+    sellerName: 'V12 Showroom',
+    sellerWhatsapp: DEFAULT_WHATSAPP,
+    isAuction: true,
+    auctionEndTime: new Date(Date.now() + 1000 * 60 * 15).toISOString(), // 15 minutes from now
+    currentBid: 420000,
     status: 'available',
     specs: {
-      engine: '3.0L I6',
-      horsepower: '335 hp',
-      color: 'Alpine White'
+      engine: '6.5L V12',
+      horsepower: '770 hp',
+      color: 'Giallo Orion'
     },
-    description: 'The BMW X5 is a versatile and luxury SUV that offers a great balance of comfort and performance.'
+    description: 'The pinnacle of performance. SVJ stands for Superveloce Jota, signifying its track-focused nature.'
   },
   {
     id: '4',
-    make: 'Toyota',
-    model: 'Land Cruiser 300',
-    year: 2024,
-    price: 95000,
-    images: ['https://storage.googleapis.com/dala-prod-public-storage/generated-images/deb913b9-2ff6-42c1-8b8e-1fa1eb9cef03/showroom-cars-f269de2c-1774844778686.webp'],
-    image: 'https://storage.googleapis.com/dala-prod-public-storage/generated-images/deb913b9-2ff6-42c1-8b8e-1fa1eb9cef03/showroom-cars-f269de2c-1774844778686.webp',
-    gallery: ['https://storage.googleapis.com/dala-prod-public-storage/generated-images/deb913b9-2ff6-42c1-8b8e-1fa1eb9cef03/showroom-cars-f269de2c-1774844778686.webp'],
-    mileage: 0,
-    fuelType: 'Diesel',
+    make: 'Ferrari',
+    model: 'F8 Tributo',
+    year: 2021,
+    price: 320000,
+    images: ['https://storage.googleapis.com/dala-prod-public-storage/generated-images/deb913b9-2ff6-42c1-8b8e-1fa1eb9cef03/hero-car-1-8c7f818a-1774845104161.webp'],
+    image: 'https://storage.googleapis.com/dala-prod-public-storage/generated-images/deb913b9-2ff6-42c1-8b8e-1fa1eb9cef03/hero-car-1-8c7f818a-1774845104161.webp',
+    gallery: ['https://storage.googleapis.com/dala-prod-public-storage/generated-images/deb913b9-2ff6-42c1-8b8e-1fa1eb9cef03/hero-car-1-8c7f818a-1774845104161.webp'],
+    mileage: 2500,
+    fuelType: 'Petrol',
     transmission: 'Automatic',
-    condition: 'New',
-    engine: '3.3L V6 Turbo',
-    location: 'Yokohama, Japan',
+    condition: 'Used',
+    engine: '3.9L V8 Twin-Turbo',
+    location: 'London, UK',
     sellerId: 's4',
-    sellerName: 'Global Exports',
+    sellerName: 'Classic Collection',
+    sellerWhatsapp: DEFAULT_WHATSAPP,
     isAuction: false,
-    isImported: true,
-    status: 'shipped',
-    eta: '2024-06-15',
+    status: 'available',
     specs: {
-      engine: '3.3L V6 Turbo',
-      horsepower: '304 hp',
-      color: 'Pearl White'
+      engine: '3.9L V8 Twin-Turbo',
+      horsepower: '710 hp',
+      color: 'Rosso Corsa'
     },
-    description: 'The ultimate off-roader, now more powerful and refined than ever before.'
+    description: 'The F8 Tributo is a celebration of excellence, the ultimate expression of the Prancing Horse’s classic two-seater berlinetta.'
   }
 ];

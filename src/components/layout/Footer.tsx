@@ -1,6 +1,7 @@
 import React from 'react';
 import { Car, Share2, Globe, Send, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { APP_NAME } from '../../lib/constants';
 
 export const Footer = () => {
   return (
@@ -10,7 +11,7 @@ export const Footer = () => {
           <div className="col-span-1 lg:col-span-2 space-y-8">
             <Link to="/" className="flex items-center gap-2 text-3xl font-bold tracking-tight text-primary font-serif">
               <Car className="h-10 w-10" />
-              AUTOHUB
+              {APP_NAME}
             </Link>
             <p className="max-w-xs text-lg text-primary/60 leading-relaxed font-light">
               Redefining the standard of automotive excellence. The premier global marketplace for verified elite vehicles.
@@ -61,7 +62,7 @@ export const Footer = () => {
 
         <div className="mt-24 border-t border-primary/10 pt-12 flex flex-col sm:flex-row justify-between items-center gap-6">
           <p className="text-xs text-primary/40 font-bold uppercase tracking-widest">
-            &copy; {new Date().getFullYear()} AUTOHUB ELITE MOTORS. ALL RIGHTS RESERVED.
+            &copy; {new Date().getFullYear()} {APP_NAME} ELITE MOTORS. ALL RIGHTS RESERVED.
           </p>
           <div className="flex gap-8">
              <span className="text-[10px] text-primary/30 uppercase tracking-[0.2em] font-bold">London</span>

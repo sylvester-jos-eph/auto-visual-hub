@@ -19,6 +19,7 @@ export interface Car {
   location: string;
   sellerId: string;
   sellerName?: string;
+  sellerWhatsapp?: string;
   isAuction: boolean;
   auctionEnds?: string;
   auctionEndTime?: string;
@@ -44,6 +45,9 @@ export interface User {
   role: 'buyer' | 'seller' | 'admin';
   avatar?: string;
   isVerified: boolean;
+  whatsappNumber?: string;
+  isApproved?: boolean;
+  subscriptionActive?: boolean;
 }
 
 export interface Bid {
@@ -53,4 +57,11 @@ export interface Bid {
   userName: string;
   amount: number;
   timestamp: string;
+}
+
+export interface AnalyticsData {
+  name: string;
+  sales: number;
+  revenue: number;
+  users: number;
 }

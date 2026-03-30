@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Heart, Bell, Menu, X, Car, LayoutDashboard, LogOut, PlusCircle, Search, User } from 'lucide-react';
-import { Button } from '../ui/button';
+import { Heart, Bell, Menu, X, Car, LayoutDashboard, LogOut, PlusCircle, Search, User as UserIcon } from 'lucide-react';
+import { Button } from '../ui/Button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../lib/utils';
+import { APP_NAME } from '../../lib/constants';
+import { useAuth } from '@/contexts/AuthContext';
 
-interface NavbarProps {
-  isLoggedIn?: boolean;
-}
-
-export const Navbar = ({ isLoggedIn = false }: NavbarProps) => {
+export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -21,6 +20,12 @@ export const Navbar = ({ isLoggedIn = false }: NavbarProps) => {
   ];
 
   const isActive = (path: string) => location.pathname === path;
+
+  const handleLogout = () => {
+    signOut();
+    navigate('/');
+    setIsMenuOpen(false);
+  };
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-primary/20 bg-background/95 backdrop-blur-md">
@@ -33,7 +38,7 @@ export const Navbar = ({ isLoggedIn = false }: NavbarProps) => {
             >
               <Car className="h-7 w-7" />
             </motion.div>
-            <span className="hidden sm:inline-block font-serif tracking-widest">AUTOHUB</span>
+            <span className="hidden sm:inline-block font-serif tracking-widest">{APP_NAME}</span>
           </Link>
         </div>
 
@@ -66,7 +71,7 @@ export const Navbar = ({ isLoggedIn = false }: NavbarProps) => {
             </Button>
           </div>
 
-          {isLoggedIn ? (
+          {user ? (
             <div className="flex items-center gap-4">
               <Button 
                 variant="primary" 
@@ -77,12 +82,18 @@ export const Navbar = ({ isLoggedIn = false }: NavbarProps) => {
                 <LayoutDashboard className="mr-2 h-4 w-4" />
                 Account
               </Button>
-              <div className="h-10 w-10 overflow-hidden rounded-full border-2 border-primary ring-2 ring-primary/20">
-                <img
-                  src={`https://api.dicebear.com/7.x/avataaars/svg?seed=Felix`}
-                  alt="Avatar"
-                  className="h-full w-full object-cover bg-primary/10"
-                />
+              <div className="flex items-center gap-3">
+                <div className="hidden md:flex flex-col items-end">
+                  <span className="text-sm font-bold text-white">{user.name}</span>
+                  <span className="text-[10px] text-primary/40 font-bold uppercase tracking-widest">{user.role}</span>
+                </div>
+                <div className="h-10 w-10 overflow-hidden rounded-full border-2 border-primary ring-2 ring-primary/20 cursor-pointer" onClick={() => navigate('/dashboard')}>
+                  <img
+                    src={user.avatar}
+                    alt="Avatar"
+                    className="h-full w-full object-cover bg-primary/10"
+                  />
+                </div>
               </div>
             </div>
           ) : (
@@ -126,7 +137,7 @@ export const Navbar = ({ isLoggedIn = false }: NavbarProps) => {
               ))}
               <hr className="border-primary/10" />
               <div className="flex flex-col gap-4 pt-4">
-                 {!isLoggedIn ? (
+                 {!user ? (
                    <>
                     <Button className="w-full" variant="outline" onClick={() => { navigate('/login'); setIsMenuOpen(false); }}>
                       Login
@@ -137,10 +148,19 @@ export const Navbar = ({ isLoggedIn = false }: NavbarProps) => {
                    </>
                  ) : (
                    <>
+                    <div className="flex items-center gap-3 p-2 bg-primary/5 rounded-xl mb-2">
+                      <div className="h-10 w-10 rounded-full border border-primary">
+                        <img src={user.avatar} className="rounded-full" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-white">{user.name}</p>
+                        <p className="text-xs text-primary/60">{user.email}</p>
+                      </div>
+                    </div>
                     <Button className="w-full" variant="outline" onClick={() => { navigate('/dashboard'); setIsMenuOpen(false); }}>
                       Dashboard
                     </Button>
-                    <Button className="w-full" variant="destructive" onClick={() => setIsMenuOpen(false)}>
+                    <Button className="w-full bg-destructive/10 text-destructive border-destructive/20 hover:bg-destructive hover:text-white" onClick={handleLogout}>
                       <LogOut className="mr-2 h-4 w-4" />
                       Sign Out
                     </Button>

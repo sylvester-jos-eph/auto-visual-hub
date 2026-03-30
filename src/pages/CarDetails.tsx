@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
-  ChevronLeft, Heart, Share2, MapPin, Gauge, Fuel, Calendar, 
+  ChevronLeft, Heart, Share2, Gauge, Fuel, Calendar, 
   Settings2, CheckCircle2, MessageSquare, Info, Timer, 
-  TrendingUp, Download, ShieldCheck, Truck, ArrowRight, Shield
+  ShieldCheck, Phone
 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, Badge, Input } from '../components/ui/Layout';
@@ -11,20 +11,77 @@ import { MOCK_CARS } from '../lib/constants';
 import { formatCurrency, cn } from '../lib/utils';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { supabase } from '../lib/supabase';
+import { Car } from '../types';
+import { AuctionCountdown } from '../components/auctions/AuctionCountdown';
 
 export const CarDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const car = MOCK_CARS.find(c => c.id === id);
+  const [car, setCar] = useState<Car | null>(null);
+  const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
   const [bidAmount, setBidAmount] = useState<number>(0);
-  const [timeLeft, setTimeLeft] = useState('23:45:12');
+
+  useEffect(() => {
+    const fetchCar = async () => {
+      setLoading(true);
+      try {
+        const mockCar = MOCK_CARS.find(c => c.id === id);
+        
+        const { data, error } = await supabase
+          .from('cars')
+          .select('*')
+          .eq('id', id)
+          .single();
+
+        if (data) {
+          const dbCar: Car = {
+            ...data,
+            image: data.images?.[0] || 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80',
+            gallery: data.images || [],
+            sellerName: 'Verified Seller',
+            condition: 'New',
+            mileage: 0,
+            fuelType: 'Petrol',
+            transmission: 'Automatic',
+            engine: 'V8',
+            location: 'Global Hub',
+            specs: {
+              engine: 'V8',
+              horsepower: '500 hp',
+              color: 'Metallic Gray'
+            }
+          };
+          setCar(dbCar);
+        } else if (mockCar) {
+          setCar(mockCar);
+        } else {
+          setCar(null);
+        }
+      } catch (error) {
+        console.error('Error fetching car:', error);
+        const mockCar = MOCK_CARS.find(c => c.id === id);
+        setCar(mockCar || null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCar();
+  }, [id]);
 
   useEffect(() => {
     if (car && car.isAuction) {
       setBidAmount((car.currentBid || car.price) + 500);
     }
   }, [car]);
+
+  if (loading) return (
+    <div className="flex h-screen w-full items-center justify-center bg-background">
+       <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+    </div>
+  );
 
   if (!car) return (
     <div className="p-20 text-center bg-background min-h-screen">
@@ -46,12 +103,18 @@ export const CarDetails = () => {
     navigate('/checkout');
   };
 
+  const handleWhatsappContact = () => {
+    const number = car.sellerWhatsapp || '0741958421';
+    const message = `Hello, I am interested in the ${car.year} ${car.make} ${car.model} listed on SiLLA AUTOHUB.`;
+    window.open(`https://wa.me/${number}?text=${encodeURIComponent(message)}`, '_blank');
+  };
+
   const carSpecs = [
     { label: 'Year', value: car.year, icon: Calendar },
-    { label: 'Mileage', value: `${car.mileage.toLocaleString()} KM`, icon: Gauge },
-    { label: 'Fuel Type', value: car.fuelType, icon: Fuel },
-    { label: 'Engine', value: car.specs?.engine || car.engine, icon: Settings2 },
-    { label: 'Transmission', value: car.transmission, icon: Info },
+    { label: 'Mileage', value: `${(car.mileage || 0).toLocaleString()} KM`, icon: Gauge },
+    { label: 'Fuel Type', value: car.fuelType || 'Petrol', icon: Fuel },
+    { label: 'Engine', value: car.specs?.engine || car.engine || 'V8', icon: Settings2 },
+    { label: 'Transmission', value: car.transmission || 'Automatic', icon: Info },
     { label: 'Security', value: 'Verified', icon: ShieldCheck },
   ];
 
@@ -74,7 +137,7 @@ export const CarDetails = () => {
                 key={activeImage}
                 initial={{ opacity: 0, scale: 1.05 }}
                 animate={{ opacity: 1, scale: 1 }}
-                src={(car.gallery && car.gallery[activeImage]) || car.image || car.images[0]}
+                src={(car.gallery && car.gallery[activeImage]) || car.image || (car.images && car.images[0])}
                 className="h-full w-full object-cover"
               />
               <div className="absolute bottom-6 right-6 flex gap-3">
@@ -91,7 +154,7 @@ export const CarDetails = () => {
             </div>
             
             <div className="flex gap-4 overflow-x-auto pb-4">
-              {(car.gallery || car.images).map((img, i) => (
+              {(car.gallery || car.images || []).map((img, i) => (
                 <button
                   key={i}
                   onClick={() => setActiveImage(i)}
@@ -121,19 +184,9 @@ export const CarDetails = () => {
              <div className="prose prose-invert max-w-none">
                <p className="text-primary/70 text-lg leading-relaxed font-light">
                  This exceptional {car.year} {car.make} {car.model} is presented in immaculate condition. 
-                 A true testament to engineering excellence, featuring the legendary {car.specs?.engine || car.engine} powerplant. 
+                 A true testament to engineering excellence, featuring the legendary {car.specs?.engine || car.engine || 'V8'} powerplant. 
                  Carefully curated and verified by our specialized team for authenticity and performance standards.
                </p>
-             </div>
-             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 border-t border-primary/10">
-                <div className="flex items-center gap-3">
-                   <Shield className="h-6 w-6 text-primary" />
-                   <span className="text-sm text-white font-semibold">100-Point Inspection Passed</span>
-                </div>
-                <div className="flex items-center gap-3">
-                   <Truck className="h-6 w-6 text-primary" />
-                   <span className="text-sm text-white font-semibold">Enclosed Global Delivery Available</span>
-                </div>
              </div>
           </div>
         </div>
@@ -142,11 +195,17 @@ export const CarDetails = () => {
           <Card className="p-8 bg-[#0a3a25] border-primary/20 sticky top-32">
             {car.isAuction ? (
               <div className="space-y-8">
-                <div className="flex items-center justify-between">
-                  <Badge variant="warning" className="animate-pulse px-4 py-1 text-sm">
+                <div className="flex flex-col gap-6">
+                  <Badge variant="warning" className="animate-pulse px-4 py-1 text-sm w-fit">
                     <Timer className="mr-2 h-4 w-4" /> LIVE AUCTION
                   </Badge>
-                  <span className="font-mono text-2xl font-bold text-white">{timeLeft}</span>
+                  
+                  {(car.auctionEnds || car.auctionEndTime) && (
+                    <AuctionCountdown 
+                      endTime={car.auctionEnds || car.auctionEndTime || ''}
+                      className="justify-start"
+                    />
+                  )}
                 </div>
                 
                 <div className="space-y-1">
@@ -168,7 +227,6 @@ export const CarDetails = () => {
                     />
                     <Button onClick={handlePlaceBid} className="px-10 h-14 text-lg shadow-xl shadow-primary/20">BID</Button>
                   </div>
-                  <p className="text-[10px] text-center text-primary/40 uppercase tracking-widest">Min Increment: $500</p>
                 </div>
               </div>
             ) : (
@@ -182,9 +240,6 @@ export const CarDetails = () => {
                   <Button className="w-full h-16 text-xl shadow-xl shadow-primary/20" size="lg" onClick={handleBuyNow}>
                     Acquire Now
                   </Button>
-                  <Button variant="outline" className="w-full h-16 text-lg border-primary/20 text-primary hover:bg-primary/10" size="lg">
-                    Inquire Private Offer
-                  </Button>
                 </div>
               </div>
             )}
@@ -192,21 +247,24 @@ export const CarDetails = () => {
             <div className="mt-8 pt-8 border-t border-primary/10">
                <div className="flex items-center gap-5">
                   <div className="h-14 w-14 overflow-hidden rounded-full border-2 border-primary ring-4 ring-primary/10">
-                     <img src={`https://api.dicebear.com/7.x/initials/svg?seed=${car.sellerName || car.sellerId}`} className="bg-primary/10" />
+                     <img src={`https://api.dicebear.com/7.x/initials/svg?seed=${car.sellerName || car.sellerId}`} className="bg-primary/10" alt="seller" />
                   </div>
                   <div className="flex-1">
                      <div className="flex items-center gap-1.5 font-bold text-white uppercase tracking-widest text-sm">
                         {car.sellerName || 'Private Seller'} <CheckCircle2 className="h-4 w-4 text-primary" />
                      </div>
-                     <p className="text-xs text-primary/40 font-semibold">Elite Tier Seller \u2022 120+ Private Sales</p>
+                     <p className="text-xs text-primary/40 font-semibold">Elite Tier Seller • 120+ Private Sales</p>
                   </div>
                </div>
-               <div className="mt-8 flex gap-3">
-                  <Button variant="outline" className="flex-1 border-primary/10 text-primary hover:bg-primary/5">
-                     <MessageSquare className="mr-2 h-4 w-4" /> Message
+               <div className="mt-8 flex flex-col gap-3">
+                  <Button 
+                    className="w-full h-14 bg-green-600 hover:bg-green-700 text-white"
+                    onClick={handleWhatsappContact}
+                  >
+                     <Phone className="mr-2 h-5 w-5" /> Chat on WhatsApp
                   </Button>
-                  <Button variant="outline" className="flex-1 border-primary/10 text-primary hover:bg-primary/5">
-                     <Download className="mr-2 h-4 w-4" /> dossier
+                  <Button variant="outline" className="w-full h-12 border-primary/10 text-primary hover:bg-primary/5">
+                     <MessageSquare className="mr-2 h-4 w-4" /> Send Inquiry
                   </Button>
                </div>
             </div>
@@ -215,7 +273,7 @@ export const CarDetails = () => {
           <div className="p-8 rounded-3xl bg-primary border border-primary/20 text-background">
              <h3 className="text-lg font-bold uppercase tracking-widest mb-2">Secure Assurance</h3>
              <p className="text-sm text-background/80 leading-relaxed font-medium">
-                All transactions are held in escrow. Delivery is monitored by our dedicated concierge team until the vehicle reaches your doorstep.
+                All transactions are held in escrow. Delivery is monitored by our dedicated concierge team.
              </p>
           </div>
         </div>

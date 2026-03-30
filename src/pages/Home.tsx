@@ -1,14 +1,21 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, ChevronRight, Zap, Shield, Globe, TrendingUp, Heart, Car as CarIcon, Sparkles, ArrowRight } from 'lucide-react';
+import { ChevronRight, Shield, Globe, TrendingUp, Car as CarIcon, Sparkles, Phone, MessageCircle } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, Badge } from '../components/ui/Layout';
-import { MOCK_CARS } from '../lib/constants';
-import { formatCurrency } from '../lib/utils';
+import { MOCK_CARS, APP_NAME } from '../lib/constants';
 import { motion } from 'framer-motion';
+import { CarCard } from '../components/cars/CarCard';
+import { useSettings } from '../contexts/SettingsContext';
 
 export const Home = () => {
   const navigate = useNavigate();
+  const { whatsappNumber } = useSettings();
+
+  const handleContactAdmin = () => {
+    const message = `Hello ${APP_NAME} Support, I have an inquiry.`;
+    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
+  };
 
   return (
     <div className="flex flex-col gap-12 sm:gap-24 pb-24">
@@ -34,8 +41,9 @@ export const Home = () => {
             <Badge variant="outline" className="border-primary/50 text-primary py-1 px-4 text-sm tracking-[0.2em] uppercase">
                <Sparkles className="mr-2 h-4 w-4" /> The Gold Standard of Motoring
             </Badge>
-            <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-7xl lg:text-8xl font-serif">
-              Luxury <span className="text-primary">Defined</span> By Every Mile.
+            <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-7xl lg:text-8xl font-serif leading-[1.1]">
+              Luxury <span className="text-primary italic">Defined</span>.<br />
+              <span className="text-primary">{APP_NAME}</span>
             </h1>
             <p className="max-w-xl text-lg sm:text-2xl text-primary/80 leading-relaxed">
               Curated collection of the world's most exceptional vehicles. Buy, sell, and auction with unparalleled confidence.
@@ -80,50 +88,7 @@ export const Home = () => {
         
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {MOCK_CARS.slice(0, 4).map((car) => (
-            <motion.div
-              key={car.id}
-              whileHover={{ y: -10 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Card className="group relative overflow-hidden p-0 border-primary/10 bg-[#0a3a25]" onClick={() => navigate(`/car/${car.id}`)}>
-                <div className="relative aspect-[16/11] overflow-hidden">
-                  <img
-                    src={car.image}
-                    alt={`${car.make} ${car.model}`}
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="absolute left-4 top-4 flex flex-col gap-2">
-                    {car.isAuction && <Badge variant="warning">Auction</Badge>}
-                    {car.isImported && <Badge variant="success">Import</Badge>}
-                  </div>
-                  <button className="absolute right-4 top-4 rounded-full bg-black/40 p-2 text-white/80 hover:text-primary backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all">
-                    <Heart className="h-5 w-5" />
-                  </button>
-                </div>
-                
-                <div className="p-6 space-y-4">
-                  <div className="flex items-center justify-between text-xs text-primary/60 font-semibold uppercase tracking-widest">
-                    <span>{car.year} • {car.mileage.toLocaleString()} KM</span>
-                    <span>{car.location}</span>
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-white group-hover:text-primary transition-colors">
-                      {car.make} {car.model}
-                    </h3>
-                    <p className="text-sm text-primary/40 mt-1">{car.transmission} • {car.fuelType}</p>
-                  </div>
-                  <div className="flex items-center justify-between pt-4 border-t border-primary/10">
-                    <span className="text-2xl font-bold text-primary">
-                      {formatCurrency(car.price)}
-                    </span>
-                    <div className="h-10 w-10 flex items-center justify-center rounded-full border border-primary/20 text-primary group-hover:bg-primary group-hover:text-background transition-all">
-                       <ArrowRight className="h-5 w-5" />
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
+            <CarCard key={car.id} car={car} />
           ))}
         </div>
       </section>
@@ -154,12 +119,35 @@ export const Home = () => {
         </div>
       </section>
 
+      {/* WhatsApp Support Section */}
+      <section className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+         <Card className="relative overflow-hidden bg-primary/5 border-primary/10 p-12 text-center space-y-8">
+            <div className="absolute top-0 right-0 p-8 opacity-10">
+               <MessageCircle className="h-48 w-48 text-primary" />
+            </div>
+            <div className="relative z-10 max-w-2xl mx-auto space-y-6">
+               <Badge className="bg-green-500/10 text-green-500 border-none px-6 py-2">Always Available</Badge>
+               <h2 className="text-4xl font-bold text-white font-serif tracking-tight">Direct Support from SiLLA</h2>
+               <p className="text-lg text-primary/60">
+                 Need assistance or have questions for our administration? Reach out directly through WhatsApp for immediate support and guidance.
+               </p>
+               <Button 
+                size="lg" 
+                className="h-16 px-12 bg-green-600 hover:bg-green-700 text-white shadow-xl shadow-green-600/20"
+                onClick={handleContactAdmin}
+               >
+                 <Phone className="mr-3 h-6 w-6" /> Chat with Admin
+               </Button>
+            </div>
+         </Card>
+      </section>
+
       {/* CTA Section */}
       <section className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-primary via-primary/90 to-[#b8860b] px-8 py-20 shadow-2xl text-center">
           <div className="relative z-10 space-y-8 max-w-3xl mx-auto">
             <h2 className="text-4xl font-bold tracking-tight text-background sm:text-6xl font-serif leading-tight">
-              List Your Masterpiece With The <span className="italic">Hub</span>
+              List Your Masterpiece With <span className="italic">{APP_NAME}</span>
             </h2>
             <p className="text-lg sm:text-2xl text-background/80">
               Connect with serious collectors worldwide. Professional photography, secure transactions, and global logistics handled by our elite team.
